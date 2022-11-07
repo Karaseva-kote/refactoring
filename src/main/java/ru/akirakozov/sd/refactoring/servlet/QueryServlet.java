@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -22,28 +23,28 @@ public class QueryServlet extends HttpServlet {
 			try {
 				Map.Entry<String, Integer> result = ProductDao.findMax();
 				HttpWriter.doMaxProductResponse(response.getWriter(), result);
-			} catch (Exception e) {
+			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 		} else if ("min".equals(command)) {
 			try {
 				Map.Entry<String, Integer> result = ProductDao.findMin();
 				HttpWriter.doMinProductResponse(response.getWriter(), result);
-			} catch (Exception e) {
+			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 		} else if ("sum".equals(command)) {
 			try {
 				int sum = ProductDao.findSum();
 				HttpWriter.doSumProductResponse(response.getWriter(), sum);
-			} catch (Exception e) {
+			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 		} else if ("count".equals(command)) {
 			try {
 				int count = ProductDao.findCount();
 				HttpWriter.doCountProductResponse(response.getWriter(), count);
-			} catch (Exception e) {
+			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 		} else {

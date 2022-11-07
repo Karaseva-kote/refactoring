@@ -3,8 +3,10 @@ package ru.akirakozov.sd.refactoring;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ public class Utils {
 	private static final int port = 8082;
 	private static final String requestPrefix = String.format("http://localhost:%d/", port);
 
-	static void prepareDB(String ... sql) throws Exception {
+	static void prepareDB(String ... sql) throws SQLException {
 		ProductDao.createDB();
 		ProductDao.clearDB();
 		for (String s : sql) {
@@ -43,12 +45,12 @@ public class Utils {
 		}
 	}
 
-	private static String getResponse(String request) throws Exception {
+	private static String getResponse(String request) throws IOException {
 		URL url = new URL(requestPrefix + request);
 		return new String(url.openStream().readAllBytes(), StandardCharsets.UTF_8);
 	}
 
-	private static void checkDB(List<Map.Entry<String, Integer>> expectedDBStatement) throws Exception {
+	private static void checkDB(List<Map.Entry<String, Integer>> expectedDBStatement) throws SQLException {
 		List<Map.Entry<String, Integer>> actualDBStatement = ProductDao.getProducts();
 		assertThat(actualDBStatement, is(expectedDBStatement));
 	}

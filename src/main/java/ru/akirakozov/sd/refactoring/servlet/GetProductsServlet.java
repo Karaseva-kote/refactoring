@@ -6,6 +6,8 @@ import ru.akirakozov.sd.refactoring.ProductDao;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +17,11 @@ import java.util.Map;
 public class GetProductsServlet extends HttpServlet {
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
 			List<Map.Entry<String, Integer>> result = ProductDao.getProducts();
 			HttpWriter.doGetProductResponse(response.getWriter(), result);
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 

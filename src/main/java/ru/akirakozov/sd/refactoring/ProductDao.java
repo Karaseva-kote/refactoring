@@ -3,10 +3,7 @@ package ru.akirakozov.sd.refactoring;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +25,7 @@ public class ProductDao {
 
 	private static final String dbUrl = "jdbc:sqlite:test.db";
 
-	private static void doActionDB(ThrowingConsumer<Statement> consumer) throws Exception {
+	private static void doActionDB(ThrowingConsumer<Statement> consumer) throws SQLException {
 		try (Connection c = DriverManager.getConnection(dbUrl)) {
 			try (Statement statement = c.createStatement()) {
 				consumer.accept(statement);
@@ -36,11 +33,11 @@ public class ProductDao {
 		}
 	}
 
-	public static void createDB() throws Exception {
+	public static void createDB() throws SQLException {
 		doActionDB(statement -> statement.executeUpdate(createProductQuery));
 	}
 
-	public static void insertProduct(String name, Long price) throws Exception {
+	public static void insertProduct(String name, Long price) throws SQLException {
 		Map<String, Object> substitutions = Map.of(
 				"name", name,
 				"price", price
@@ -50,7 +47,7 @@ public class ProductDao {
 		doActionDB(statement -> statement.executeUpdate(query));
 	}
 
-	public static List<Map.Entry<String, Integer>> getProducts() throws Exception {
+	public static List<Map.Entry<String, Integer>> getProducts() throws SQLException {
 		List<Map.Entry<String, Integer>> result = new ArrayList<>();
 		doActionDB(statement -> {
 			ResultSet rs = statement.executeQuery(selectProductQuery);
@@ -63,7 +60,7 @@ public class ProductDao {
 		return result;
 	}
 
-	private static Map.Entry<String, Integer> findMaxOrMin(String query) throws Exception {
+	private static Map.Entry<String, Integer> findMaxOrMin(String query) throws SQLException {
 		AtomicReference<Map.Entry<String, Integer>> result = new AtomicReference<>(null);
 		doActionDB(statement -> {
 			ResultSet rs = statement.executeQuery(query);
@@ -76,15 +73,15 @@ public class ProductDao {
 		return result.get();
 	}
 
-	public static Map.Entry<String, Integer> findMax() throws Exception {
+	public static Map.Entry<String, Integer> findMax() throws SQLException {
 		return findMaxOrMin(selectMaxProductQuery);
 	}
 
-	public static Map.Entry<String, Integer> findMin() throws Exception {
+	public static Map.Entry<String, Integer> findMin() throws SQLException{
 		return findMaxOrMin(selectMinProductQuery);
 	}
 
-	private static int findSumOrCount(String query) throws Exception {
+	private static int findSumOrCount(String query) throws SQLException {
 		AtomicInteger result = new AtomicInteger();
 		doActionDB(statement -> {
 			ResultSet rs = statement.executeQuery(query);
@@ -95,19 +92,19 @@ public class ProductDao {
 		return result.get();
 	}
 
-	public static int findSum() throws Exception {
+	public static int findSum() throws SQLException {
 		return findSumOrCount(selectSumProductQuery);
 	}
 
-	public static int findCount() throws Exception {
+	public static int findCount() throws SQLException {
 		return findSumOrCount(selectCountProductQuery);
 	}
 
-	public static void clearDB() throws Exception {
+	public static void clearDB() throws SQLException {
 		doActionDB(statement -> statement.executeUpdate(clearProductQuery));
 	}
 
-	public static void executeQuery(String query) throws Exception {
+	public static void executeQuery(String query) throws SQLException {
 		doActionDB(statement -> statement.executeUpdate(query));
 	}
 
