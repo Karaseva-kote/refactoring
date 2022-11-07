@@ -1,5 +1,6 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
+import ru.akirakozov.sd.refactoring.HttpWriter;
 import ru.akirakozov.sd.refactoring.ProductDao;
 
 import javax.servlet.http.HttpServlet;
@@ -20,57 +21,28 @@ public class QueryServlet extends HttpServlet {
 		if ("max".equals(command)) {
 			try {
 				Map.Entry<String, Integer> result = ProductDao.findMax();
-
-				response.getWriter().println("<html><body>");
-				response.getWriter().println("<h1>Product with max price: </h1>");
-
-				if (result != null) {
-					String name = result.getKey();
-					int price = result.getValue();
-					response.getWriter().println(name + "\t" + price + "</br>");
-				}
-
-				response.getWriter().println("</body></html>");
+				HttpWriter.doMaxProductResponse(response.getWriter(), result);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		} else if ("min".equals(command)) {
 			try {
 				Map.Entry<String, Integer> result = ProductDao.findMin();
-				response.getWriter().println("<html><body>");
-				response.getWriter().println("<h1>Product with min price: </h1>");
-
-				if (result != null) {
-					String name = result.getKey();
-					int price = result.getValue();
-					response.getWriter().println(name + "\t" + price + "</br>");
-				}
-
-				response.getWriter().println("</body></html>");
+				HttpWriter.doMinProductResponse(response.getWriter(), result);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		} else if ("sum".equals(command)) {
 			try {
 				int sum = ProductDao.findSum();
-				response.getWriter().println("<html><body>");
-				response.getWriter().println("Summary price: ");
-
-				response.getWriter().println(sum);
-
-				response.getWriter().println("</body></html>");
+				HttpWriter.doSumProductResponse(response.getWriter(), sum);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		} else if ("count".equals(command)) {
 			try {
 				int count = ProductDao.findCount();
-				response.getWriter().println("<html><body>");
-				response.getWriter().println("Number of products: ");
-
-				response.getWriter().println(count);
-
-				response.getWriter().println("</body></html>");
+				HttpWriter.doCountProductResponse(response.getWriter(), count);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

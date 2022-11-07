@@ -1,5 +1,6 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
+import ru.akirakozov.sd.refactoring.HttpWriter;
 import ru.akirakozov.sd.refactoring.ProductDao;
 
 import javax.servlet.http.HttpServlet;
@@ -17,16 +18,7 @@ public class GetProductsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			List<Map.Entry<String, Integer>> result = ProductDao.getProducts();
-
-			response.getWriter().println("<html><body>");
-
-			for (Map.Entry<String, Integer> entry : result) {
-				String name = entry.getKey();
-				int price = entry.getValue();
-				response.getWriter().println(name + "\t" + price + "</br>");
-			}
-
-			response.getWriter().println("</body></html>");
+			HttpWriter.doGetProductResponse(response.getWriter(), result);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

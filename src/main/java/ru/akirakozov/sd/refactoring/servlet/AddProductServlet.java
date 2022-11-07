@@ -1,5 +1,6 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
+import ru.akirakozov.sd.refactoring.HttpWriter;
 import ru.akirakozov.sd.refactoring.ProductDao;
 
 import javax.servlet.http.HttpServlet;
@@ -23,8 +24,8 @@ public class AddProductServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
+        HttpWriter.doAddProductResponse(response.getWriter());
         response.setContentType("text/html");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println("OK");
     }
 }
