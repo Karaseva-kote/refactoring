@@ -8,51 +8,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * @author akirakozov
  */
 public class QueryServlet extends HttpServlet {
+	enum Command {
+		max, min, sum, count, unknown
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String command = request.getParameter("command");
+		String parameterCommand = request.getParameter("command");
+		Command command = Command.unknown;
 
-		if ("max".equals(command)) {
-			try {
-				Map.Entry<String, Integer> result = ProductDao.findMax();
-				HttpWriter.doMaxProductResponse(response.getWriter(), result);
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
+		if (Arrays.stream(Command.values()).anyMatch(c -> c.toString().equals(parameterCommand))){
+			command = Command.valueOf(parameterCommand);
+		}
+
+		try {
+			switch (command) {
+				case max -> HttpWriter.doMaxProductResponse(response.getWriter(), ProductDao.findMax());
+				case min -> HttpWriter.doMinProductResponse(response.getWriter(), ProductDao.findMin());
+				case sum -> HttpWriter.doSumProductResponse(response.getWriter(), ProductDao.findSum());
+				case count -> HttpWriter.doCountProductResponse(response.getWriter(), ProductDao.findCount());
+				case unknown -> response.getWriter().println("Unknown command: " + parameterCommand);
 			}
-		} else if ("min".equals(command)) {
-			try {
-				Map.Entry<String, Integer> result = ProductDao.findMin();
-				HttpWriter.doMinProductResponse(response.getWriter(), result);
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		} else if ("sum".equals(command)) {
-			try {
-				int sum = ProductDao.findSum();
-				HttpWriter.doSumProductResponse(response.getWriter(), sum);
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		} else if ("count".equals(command)) {
-			try {
-				int count = ProductDao.findCount();
-				HttpWriter.doCountProductResponse(response.getWriter(), count);
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			response.getWriter().println("Unknown command: " + command);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
 		}
 
 		response.setContentType("text/html");
 		response.setStatus(HttpServletResponse.SC_OK);
 	}
-
 }
